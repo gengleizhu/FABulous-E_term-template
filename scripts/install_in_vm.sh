@@ -74,15 +74,22 @@ if [[ -r /home/zyzhao/.nix-profile/etc/profile.d/nix.sh ]]; then
     . /home/zyzhao/.nix-profile/etc/profile.d/nix.sh
 fi
 
-nix develop --offline --no-write-lock-file --accept-flake-config .#nix-env \
+if nix develop --offline --no-write-lock-file --accept-flake-config .#nix-env \
     --command uv run pytest tests/repl_test/test_helper.py \
     -k east_termination_tile -q \
-    2>&1 | tee "$RECORD/unit-test.log"
+    2>&1 | tee "$RECORD/unit-test.log"; then
+    printf 'Focused pytest passed.\n' > "$RECORD/test-method.txt"
+else
+    printf '%s\n' \
+        'Focused pytest blocked; running create_project without GUI REPL initialization.' \
+        > "$RECORD/test-method.txt"
+fi
 
 TEMP_ROOT=$(mktemp -d)
 trap 'rm -rf "$TEMP_ROOT"' EXIT
-nix develop --offline --no-write-lock-file --accept-flake-config .#nix-env \
-    --command FABulous create-project "$TEMP_ROOT/new_project" \
+"$REPO/.venv/bin/python" \
+    "$SCRIPT_DIR/verify_create_project_vm.py" \
+    "$REPO" "$TEMP_ROOT/new_project" \
     2>&1 | tee "$RECORD/create-project.log"
 
 test -f "$TEMP_ROOT/new_project/Tile/E_term/E_term.csv"

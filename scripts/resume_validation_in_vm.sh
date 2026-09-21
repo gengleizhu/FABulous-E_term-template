@@ -10,7 +10,7 @@ case "$BRANCH" in
     codex/e-term-template-*) ;;
     *)
         printf 'Current branch is not an E_term feature branch: %s\n' "$BRANCH" >&2
-        printf 'Switch to codex/e-term-template-20260920-175834 first.\n' >&2
+        printf 'Switch to the timestamped branch printed by the installer first.\n' >&2
         exit 1
         ;;
 esac
