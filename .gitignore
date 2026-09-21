@@ -1,0 +1,6 @@
+# Local credentials and transient records must never be committed.
+codex_vm_key*
+*.lock
+__pycache__/
+.pytest_cache/
+

@@ -1,0 +1,120 @@
+From 1082bc5d531ead917436172e2ff6eebd1ccd854e Mon Sep 17 00:00:00 2001
+From: Codex <codex@local>
+Date: Sun, 20 Sep 2026 16:25:11 +0800
+Subject: [PATCH] =feat:_include_E_term_in_new_project_templates
+
+---
+ .../user_guide/building_doc/building_fabric.md     |  7 +++++++
+ .../Tile/E_term/E_term.csv                         | 14 ++++++++++++++
+ .../Tile/E_term/E_term_switch_matrix.list          |  9 +++++++++
+ .../Tile/E_term/gds_config.yaml                    |  4 ++++
+ .../FABulous_project_template_common/fabric.csv    |  1 +
+ tests/repl_test/test_helper.py                     | 14 ++++++++++++++
+ 6 files changed, 49 insertions(+)
+ create mode 100644 fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/E_term.csv
+ create mode 100644 fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/E_term_switch_matrix.list
+ create mode 100644 fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/gds_config.yaml
+
+diff --git a/docs/source/user_guide/building_doc/building_fabric.md b/docs/source/user_guide/building_doc/building_fabric.md
+index f24ce95..033d269 100644
+--- a/docs/source/user_guide/building_doc/building_fabric.md
++++ b/docs/source/user_guide/building_doc/building_fabric.md
+@@ -20,6 +20,13 @@ FABulous create-project demo
+ 
+ This will create a new project named `demo` in the current directory.
+ 
++New projects include an `E_term` east-boundary routing tile under
++`Tile/E_term` and register it in `fabric.csv`. To use it, place `E_term` in
++the east-edge cell of each applicable interior row. Its W1, W2, WW4, and W6
++routing channels must match the neighboring core tile. The default example
++fabric keeps its existing `RAM_IO` east edge, so creating a project does not
++change the example layout automatically.
++
+ (fabulous-directory)=
+ ### The .FABulous directory
+ 
+diff --git a/fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/E_term.csv b/fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/E_term.csv
+new file mode 100644
+index 0000000..1f16319
+--- /dev/null
++++ b/fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/E_term.csv
+@@ -0,0 +1,14 @@
++TILE,E_term,,,,,,,,,,,,,,,,,
++#direction,source_name,X-offset,Y-offset,destination_name,wires,,,,,,,,,,,,,
++WEST,W1BEG,1,0,NULL,4,,,,,,,,,,,,,
++WEST,W2BEG,1,0,NULL,8,,,,,,,,,,,,,
++WEST,W2BEGb,1,0,NULL,8,,,,,,,,,,,,,
++WEST,WW4BEG,4,0,NULL,4,,,,,,,,,,,,,
++WEST,W6BEG,6,0,NULL,2,,,,,,,,,,,,,
++EAST,NULL,-1,0,E1END,4,,,,,,,,,,,,,
++EAST,NULL,-1,0,E2MID,8,,,,,,,,,,,,,
++EAST,NULL,-1,0,E2END,8,,,,,,,,,,,,,
++EAST,NULL,-4,0,EE4END,4,,,,,,,,,,,,,
++EAST,NULL,-6,0,E6END,2,,,,,,,,,,,,,
++MATRIX,./E_term_switch_matrix.list,,,,,,,,,,,,,,,,,
++EndTILE,,,,,,,,,,,,,,,,,,
+diff --git a/fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/E_term_switch_matrix.list b/fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/E_term_switch_matrix.list
+new file mode 100644
+index 0000000..e573118
+--- /dev/null
++++ b/fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/E_term_switch_matrix.list
+@@ -0,0 +1,9 @@
++# E_term
++
++# Reflect east-edge wires back into the fabric and reverse the wire indices.
++
++W1BEG[0|1|2|3],E1END[3|2|1|0]
++W2BEG[0|1|2|3|4|5|6|7],E2MID[7|6|5|4|3|2|1|0]
++W2BEGb[0|1|2|3|4|5|6|7],E2END[7|6|5|4|3|2|1|0]
++WW4BEG[0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15],EE4END[15|14|13|12|11|10|9|8|7|6|5|4|3|2|1|0]
++W6BEG[0|1|2|3|4|5|6|7|8|9|10|11],E6END[11|10|9|8|7|6|5|4|3|2|1|0]
+diff --git a/fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/gds_config.yaml b/fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/gds_config.yaml
+new file mode 100644
+index 0000000..ebe45fc
+--- /dev/null
++++ b/fabulous/fabric_files/FABulous_project_template_common/Tile/E_term/gds_config.yaml
+@@ -0,0 +1,4 @@
++DIE_AREA: [0, 0, 246, 245]
++
++pdk::gf180mcuD:
++  DIE_AREA: [0, 0, 290, 250]
+diff --git a/fabulous/fabric_files/FABulous_project_template_common/fabric.csv b/fabulous/fabric_files/FABulous_project_template_common/fabric.csv
+index 8d5b73a..5f5d01e 100644
+--- a/fabulous/fabric_files/FABulous_project_template_common/fabric.csv
++++ b/fabulous/fabric_files/FABulous_project_template_common/fabric.csv
+@@ -37,6 +37,7 @@ Tile,./Tile/RegFile/RegFile.csv,,,,,,,,,,,,,,,,,
+ Tile,./Tile/N_term_single2/N_term_single2.csv,,,,,,,,,,,,,,,,,
+ Tile,./Tile/S_term_single2/S_term_single2.csv,,,,,,,,,,,,,,,,,
+ Tile,./Tile/W_IO/W_IO.csv,,,,,,,,,,,,,,,,,
++Tile,./Tile/E_term/E_term.csv,,,,,,,,,,,,,,,,,
+ Tile,./Tile/DSP/DSP_top/DSP_top.csv,,,,,,,,,,,,,,,,,
+ Tile,./Tile/DSP/DSP_bot/DSP_bot.csv,,,,,,,,,,,,,,,,,
+ Tile,./Tile/N_term_DSP/N_term_DSP.csv,,,,,,,,,,,,,,,,,
+diff --git a/tests/repl_test/test_helper.py b/tests/repl_test/test_helper.py
+index 2761aca..e1bfeb8 100644
+--- a/tests/repl_test/test_helper.py
++++ b/tests/repl_test/test_helper.py
+@@ -44,6 +44,20 @@ def test_create_project(tmp_path: Path) -> None:
+     )
+ 
+ 
++def test_create_project_includes_east_termination_tile(tmp_path: Path) -> None:
++    """Test that new projects can place and generate the `E_term` tile."""
++    project_dir = tmp_path / "test_project_e_term"
++    create_project(project_dir)
++
++    tile_dir = project_dir / "Tile" / "E_term"
++    assert (tile_dir / "E_term.csv").exists()
++    assert (tile_dir / "E_term_switch_matrix.list").exists()
++    assert (tile_dir / "gds_config.yaml").exists()
++
++    fabric_csv = (project_dir / "fabric.csv").read_text(encoding="utf-8")
++    assert "Tile,./Tile/E_term/E_term.csv" in fabric_csv
++
++
+ def test_create_project_vhdl(tmp_path: Path) -> None:
+     """Test creating a VHDL project."""
+     # Test VHDL project creation
+-- 
+2.55.0.windows.5
+
