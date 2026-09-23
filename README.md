@@ -1,4 +1,24 @@
-# FABulous E_term project-template migration
+# FABulous E_term and E_IO project-template migrations
+
+This repository contains two portable FABulous template extensions:
+
+- the original `E_term` east-edge termination Tile migration in the repository
+  root;
+- the two-BEL `E_IO` east-edge bidirectional-I/O Tile migration under
+  [`e_io/`](e_io/README.md).
+
+To install and validate E_IO in a compatible FABulous checkout, run:
+
+```bash
+bash e_io/scripts/install_in_vm.sh /home/zyzhao/FABulous
+```
+
+E_IO is registered in every new Verilog/VHDL project and provides two
+`IO_1_bidirectional_frame_config_pass` BELs with the `A_` and `B_` prefixes.
+Its default project layout is intentionally left unchanged; projects can place
+E_IO on compatible east-edge rows.
+
+## E_term migration
 
 This repository adds the `E_term` east-edge termination tile to FABulous's
 common `create-project` template. After installation, every newly generated
